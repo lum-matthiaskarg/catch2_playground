@@ -31,12 +31,12 @@ class Fibonacci
 public:
     Fibonacci()  
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     ~Fibonacci() 
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     int calc(int n) const
@@ -81,6 +81,16 @@ TEST_CASE("Fibonacci - benchmark simple function")
     };
 }
 
+TEST_CASE("Fibonacci - benchmark with different input")
+{
+    const std::vector<int> input{0, 1, 2, 3, 4, 5}; // GENERATE would give you for each value a new benchmark report
+
+    BENCHMARK("Fibonacci with constructor", run)
+    {
+        return fibonacci(input.at(run%input.size()));
+    };
+}
+
 
 TEST_CASE("Fibonacci - benchmark a member function")
 {
@@ -98,17 +108,6 @@ TEST_CASE("Fibonacci - benchmark a member function")
     BENCHMARK("Fibonacci without constructor")
     {
         return fib.calc(n);
-    };
-}
-
-
-TEST_CASE("Fibonacci - benchmark with different input")
-{
-    const std::vector<int> input{0, 1, 2, 3, 4, 5};
-
-    BENCHMARK("Fibonacci with constructor", run)
-    {
-        return fibonacci(input.at(run%input.size()));
     };
 }
 
