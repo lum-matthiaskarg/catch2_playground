@@ -2,6 +2,7 @@ bazel-bin
 bazel-catch2
 bazel-out
 bazel-testlogs
+bazel-catch2_playground
 MODULE.bazel
 MODULE.bazel.lock
 .vscode/settings.json
