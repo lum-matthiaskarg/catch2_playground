@@ -1,0 +1,7 @@
+bazel-bin
+bazel-catch2
+bazel-out
+bazel-testlogs
+MODULE.bazel
+MODULE.bazel.lock
+.vscode/settings.json

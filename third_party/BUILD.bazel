@@ -1,0 +1,11 @@
+licenses(["notice"])  # MIT License
+
+exports_files(["LICENSE.txt"])
+
+cc_library(
+    name = "catch2",
+    hdrs = glob([
+        "single_include/catch2/**/*.hpp",
+    ]),
+    visibility = ["//visibility:public"],
+)
