@@ -6,3 +6,4 @@ bazel-catch2_playground
 MODULE.bazel
 MODULE.bazel.lock
 .vscode/settings.json
+.clwb
