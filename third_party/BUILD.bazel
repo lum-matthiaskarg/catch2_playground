@@ -9,3 +9,10 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "trompeloeil",
+    hdrs = glob(["**/*.hpp"]),         
+    includes = ["include"],                 
+    visibility = ["//visibility:public"], 
+)
