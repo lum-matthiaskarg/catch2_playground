@@ -15,3 +15,12 @@ cc_test(
     copts = ["-std=c++17"],
     deps = ["@catch2"],
 )
+
+cc_test(
+    name = "trompeloeil_example",
+    srcs = [
+        "trompeloeil.cpp",
+    ],
+    copts = ["-std=c++17"],
+    deps = ["@catch2", "@trompeloeil"],
+)
