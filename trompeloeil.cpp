@@ -390,8 +390,17 @@ public:
 
 TEST_CASE_METHOD(TestFixture, "default expectation")
 {
-  collision_calculator_.calc(Trajectory{}, Trajectory{});
-  collision_calculator_.calc(Trajectory{}, Trajectory{});
+  const auto collision_0 = collision_calculator_.calc(Trajectory{}, Trajectory{});
+  const auto collision_1 = collision_calculator_.calc(Trajectory{}, Trajectory{});
+  CHECK( collision_0->x == 1.0F );
+  CHECK( collision_1->x == 1.0F );
+}
+
+TEST_CASE_METHOD(TestFixture, "change default expectation")
+{
+  default_expectation_ = NAMED_ALLOW_CALL(collision_calculator_, calc(_, _)).RETURN(std::optional<Collision>{{2.0F, 2.0F}});
+  const auto collision = collision_calculator_.calc(Trajectory{}, Trajectory{});
+  CHECK( collision->x == 2.0F );
 }
 
 
@@ -405,3 +414,5 @@ TEST_CASE_METHOD(TestFixture, "default expectation")
 // https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-throwing-exceptions-from-matching-calls
 
 // https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-expecting-several-matching-calls-in-some-sequences
+
+// https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-writing-custom-matchers
