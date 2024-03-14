@@ -189,7 +189,7 @@ TEST_CASE("free function")
 
 
 // -----------------------------------------------------------------------------------------------------------
-// 3. what can I do with the mock
+// 4. what can I do with the mock
 // https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-setting-expectations
 // you can add expectations to the mock
 // - how often a function is called
@@ -272,7 +272,8 @@ TEST_CASE("REQUIRE CALL - matching-values-with-conditions")
   {
     {
       REQUIRE_CALL(collision_calculator, calc(expectedTrajectory, _)).RETURN(collision);
-      //REQUIRE_CALL(collision_calculator, calc(trompeloeil::eq(expectedTrajectory), _)).RETURN(collision);
+      REQUIRE_CALL(collision_calculator, calc(trompeloeil::eq(expectedTrajectory), _)).RETURN(collision);
+      collision_calculator.calc(expectedTrajectory, Trajectory{});
       collision_calculator.calc(expectedTrajectory, Trajectory{});
     }
     {
@@ -280,4 +281,127 @@ TEST_CASE("REQUIRE CALL - matching-values-with-conditions")
       collision_calculator.calc(Trajectory{2}, Trajectory{});
     }
   }
+
+
+  SECTION("more complex parameter checks")
+  {
+    REQUIRE_CALL(collision_calculator, calc(_,_)).WITH(_1.id == expectedTrajectory.id).RETURN(collision);
+    collision_calculator.calc(Trajectory{1}, Trajectory{});
+  }
+
+  SECTION("stack requirements")
+  {
+    // ALLOW_CALL(collision_calculator, calc(_,_)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
+    // REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).TIMES(2).RETURN(std::optional<Collision>{{2.0F, 2.0F}});
+    // REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).RETURN(std::optional<Collision>{{3.0F, 3.0F}});
+    // const auto collision_0 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    // const auto collision_1 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    // const auto collision_2 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    // const auto collision_3 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    trompeloeil::stream_tracer tracer{std::cout};
+    ALLOW_CALL(collision_calculator, calc(_,_)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
+    REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).TIMES(2).RETURN(std::optional<Collision>{{2.0F, 2.0F}});
+    REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).RETURN(std::optional<Collision>{{3.0F, 3.0F}});
+
+    const auto collision_0 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    CHECK(collision_0->x == 3.0F);
+    CHECK(collision_0->y == 3.0F);
+    const auto collision_1 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    CHECK(collision_1->x == 2.0F);
+    CHECK(collision_1->y == 2.0F);
+    const auto collision_2 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    CHECK(collision_2->x == 2.0F);
+    CHECK(collision_2->y == 2.0F);
+    const auto collision_3 = collision_calculator.calc(Trajectory{2}, Trajectory{});
+    CHECK(collision_3->x == 1.0F);
+    CHECK(collision_3->y == 1.0F);
+  }
 }
+
+
+
+// -----------------------------------------------------------------------------------------------------------
+// 5. lifecycle of mock
+// -----------------------------------------------------------------------------------------------------------
+
+void set_default_requirements(MockCollisionCalculator& collision_calculator)
+{
+  REQUIRE_CALL(collision_calculator, calc(_, _)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
+}
+
+std::unique_ptr<trompeloeil::expectation> create_default_requirements(MockCollisionCalculator& collision_calculator)
+{
+  return NAMED_REQUIRE_CALL(collision_calculator, calc(_, _)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
+}
+
+TEST_CASE("Lifecycle")
+{
+  MockCollisionCalculator collision_calculator;
+
+  SECTION("will this work?")
+  {
+    // {
+    //   REQUIRE_CALL(collision_calculator, calc(_, _)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
+    // }
+    // collision_calculator.calc(Trajectory{}, Trajectory{});
+  }
+
+  SECTION("will this work?")
+  {
+    // set_default_requirements(collision_calculator);
+    // collision_calculator.calc(Trajectory{}, Trajectory{});
+  }
+
+  SECTION("named requirement")
+  {
+    std::unique_ptr<trompeloeil::expectation> expectation = create_default_requirements(collision_calculator);
+    collision_calculator.calc(Trajectory{}, Trajectory{});
+  }
+}
+
+class TestFixture
+{
+public:
+  TestFixture()
+  {
+    default_expectation_ = NAMED_ALLOW_CALL(collision_calculator_, calc(_, _)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});    
+  }
+  MockCollisionCalculator collision_calculator_;
+  std::unique_ptr<trompeloeil::expectation> default_expectation_{}; 
+};
+
+
+TEST_CASE_METHOD(TestFixture, "default expectation")
+{
+  collision_calculator_.calc(Trajectory{}, Trajectory{});
+  collision_calculator_.calc(Trajectory{}, Trajectory{});
+}
+
+
+
+// follow up...
+
+// https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-define-side-effects-for-matching-calls
+
+// https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-return-references-from-matching-calls
+
+// https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-throwing-exceptions-from-matching-calls
+
+// https://github.com/rollbear/trompeloeil/blob/main/docs/CookBook.md#-expecting-several-matching-calls-in-some-sequences
