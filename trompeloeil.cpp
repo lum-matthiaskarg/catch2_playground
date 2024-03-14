@@ -291,30 +291,6 @@ TEST_CASE("REQUIRE CALL - matching-values-with-conditions")
 
   SECTION("stack requirements")
   {
-    // ALLOW_CALL(collision_calculator, calc(_,_)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
-    // REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).TIMES(2).RETURN(std::optional<Collision>{{2.0F, 2.0F}});
-    // REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).RETURN(std::optional<Collision>{{3.0F, 3.0F}});
-    // const auto collision_0 = collision_calculator.calc(Trajectory{2}, Trajectory{});
-    // const auto collision_1 = collision_calculator.calc(Trajectory{2}, Trajectory{});
-    // const auto collision_2 = collision_calculator.calc(Trajectory{2}, Trajectory{});
-    // const auto collision_3 = collision_calculator.calc(Trajectory{2}, Trajectory{});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     trompeloeil::stream_tracer tracer{std::cout};
     ALLOW_CALL(collision_calculator, calc(_,_)).RETURN(std::optional<Collision>{{1.0F, 1.0F}});
     REQUIRE_CALL(collision_calculator, calc(Trajectory{2},_)).TIMES(2).RETURN(std::optional<Collision>{{2.0F, 2.0F}});
@@ -402,7 +378,6 @@ TEST_CASE_METHOD(TestFixture, "change default expectation")
   const auto collision = collision_calculator_.calc(Trajectory{}, Trajectory{});
   CHECK( collision->x == 2.0F );
 }
-
 
 
 // follow up...
